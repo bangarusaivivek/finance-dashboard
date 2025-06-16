@@ -382,7 +382,7 @@ const MOCK_STOCKS: StockData[] = [
   },
 ]
 
-// Add freemium limits
+// Add freemium limits - ENSURE THIS IS EXPORTED
 export const FREEMIUM_LIMITS = {
   MAX_ROWS: 25,
   MAX_EXPORTS_PER_DAY: 3,
@@ -393,7 +393,7 @@ export const FREEMIUM_LIMITS = {
 // Simulate API delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// Mock API functions
+// Mock API functions - ENSURE THIS IS EXPORTED
 export const stocksService = {
   getStocks: async (params: {
     page?: number

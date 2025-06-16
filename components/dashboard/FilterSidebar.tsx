@@ -57,7 +57,7 @@ export function FilterSidebar() {
   return (
     <div
       className={cn(
-        "fixed inset-y-0 left-0 z-40 w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
+        "fixed inset-y-0 left-0 z-[30] w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
         isFilterOpen ? "translate-x-0" : "-translate-x-full",
       )}
     >

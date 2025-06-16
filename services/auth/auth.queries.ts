@@ -10,7 +10,7 @@ export const authKeys = {
   profile: (id: string) => [...authKeys.all, "profile", id] as const,
 }
 
-// Hooks
+// Hooks - Make sure all exports are properly named
 export const useLogin = () => {
   const { login } = useAuthStore()
   const queryClient = useQueryClient()
