@@ -107,7 +107,7 @@ export function Dashboard() {
         </div>
 
         {/* Sticky Dashboard Header */}
-        <div className="sticky top-0 z-[50] flex items-center justify-between p-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="sticky top-16 z-[40] flex items-center justify-between p-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center space-x-4">
             <Button variant="outline" onClick={toggleFilter} className="flex items-center space-x-2">
               <Filter className="h-4 w-4" />
