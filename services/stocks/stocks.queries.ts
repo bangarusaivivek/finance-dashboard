@@ -1,8 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import { stocksService } from "./stocks.service"
+import { stocksService, FREEMIUM_LIMITS } from "./stocks.service"
 import { useDashboardStore } from "@/lib/stores/dashboardStore"
 import { useAuthStore } from "@/lib/stores/authStore"
-import { FREEMIUM_LIMITS } from "./stocks.service"
 
 // Query keys
 export const stocksKeys = {
@@ -16,7 +15,7 @@ export const stocksKeys = {
   historical: (symbol: string, period: string) => [...stocksKeys.all, "historical", symbol, period] as const,
 }
 
-// Hooks
+// Hooks - ENSURE THIS IS EXPORTED
 export const useStocks = () => {
   const { selectedFilters, sortConfig } = useDashboardStore()
   const { user, isPremium } = useAuthStore()
