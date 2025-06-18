@@ -1,7 +1,8 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery, useMutation } from "@tanstack/react-query"
 import { stocksService, FREEMIUM_LIMITS } from "./stocks.service"
 import { useDashboardStore } from "@/lib/stores/dashboardStore"
 import { useAuthStore } from "@/lib/stores/authStore"
+import { toast } from "sonner"
 
 // Query keys
 export const stocksKeys = {
@@ -13,6 +14,7 @@ export const stocksKeys = {
   detail: (id: string) => [...stocksKeys.details(), id] as const,
   analytics: (symbol: string) => [...stocksKeys.all, "analytics", symbol] as const,
   historical: (symbol: string, period: string) => [...stocksKeys.all, "historical", symbol, period] as const,
+  exports: () => [...stocksKeys.all, "exports"] as const,
 }
 
 // Hooks - ENSURE THIS IS EXPORTED
@@ -70,5 +72,12 @@ export const useHistoricalData = (symbol: string, period = "30d") => {
     queryKey: stocksKeys.historical(symbol, period),
     queryFn: () => stocksService.getHistoricalData(symbol, period),
     enabled: !!symbol && isPremium, // Only for premium users
+  })
+}
+
+export const useExportStocks = () => {
+  return useMutation({
+    mutationKey: stocksKeys.exports(),
+    mutationFn: (filters: Record<string, any>) => stocksService.exportStocks(filters)
   })
 }

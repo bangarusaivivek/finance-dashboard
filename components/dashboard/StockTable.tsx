@@ -1,16 +1,17 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useStocks } from "@/services/stocks/stocks.queries"
 import { useDashboardStore } from "@/lib/stores/dashboardStore"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown } from "lucide-react"
+import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/lib/stores/authStore"
 import { UpgradePrompt } from "@/components/freemium/UpgradePrompt"
 import { FREEMIUM_LIMITS } from "@/services/stocks/stocks.service"
+import { StockExpandedView } from "./StockExpandedView"
 
 const columns = [
   { key: "symbol", label: "Symbol", sortable: true },
@@ -28,6 +29,7 @@ export function StockTable() {
   const { sortConfig, updateSort } = useDashboardStore()
   const { isPremium } = useAuthStore()
   const loadMoreRef = useRef<HTMLDivElement>(null)
+  const [expandedStockId, setExpandedStockId] = useState<string | null>(null)
 
   // Infinite scroll
   useEffect(() => {
@@ -65,6 +67,10 @@ export function StockTable() {
     if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`
     if (num >= 1e3) return `${(num / 1e3).toFixed(2)}K`
     return num.toString()
+  }
+
+  const handleRowClick = (stockId: string) => {
+    setExpandedStockId(expandedStockId === stockId ? null : stockId)
   }
 
   if (isLoading) {
@@ -134,27 +140,47 @@ export function StockTable() {
       {/* Table Body */}
       <div className="divide-y">
         {allStocks.map((stock, index) => (
-          <div key={`${stock.id}-${index}`} className="grid grid-cols-8 gap-4 p-4 hover:bg-muted/50 transition-colors">
-            <div className="font-medium">{stock.symbol}</div>
-            <div className="truncate" title={stock.name}>
-              {stock.name}
+          <div key={`${stock.id}-${index}`}>
+            <div
+              onClick={() => handleRowClick(stock.id)}
+              className={cn(
+                "grid grid-cols-8 gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer",
+                expandedStockId === stock.id && "bg-muted/50"
+              )}
+            >
+              <div className="font-medium flex items-center gap-2">
+                {expandedStockId === stock.id ? (
+                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                )}
+                {stock.symbol}
+              </div>
+              <div className="truncate" title={stock.name}>
+                {stock.name}
+              </div>
+              <div className="font-medium">${stock.price.toFixed(2)}</div>
+              <div className={cn("flex items-center space-x-1", stock.change >= 0 ? "text-green-600" : "text-red-600")}>
+                {stock.change >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                <span>${Math.abs(stock.change).toFixed(2)}</span>
+              </div>
+              <div className={cn("font-medium", stock.changePercent >= 0 ? "text-green-600" : "text-red-600")}>
+                {stock.changePercent >= 0 ? "+" : ""}
+                {stock.changePercent.toFixed(2)}%
+              </div>
+              <div>{formatVolume(stock.volume)}</div>
+              <div>{formatNumber(stock.marketCap)}</div>
+              <div>
+                <Badge variant="secondary" className="text-xs">
+                  {stock.sector}
+                </Badge>
+              </div>
             </div>
-            <div className="font-medium">${stock.price.toFixed(2)}</div>
-            <div className={cn("flex items-center space-x-1", stock.change >= 0 ? "text-green-600" : "text-red-600")}>
-              {stock.change >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-              <span>${Math.abs(stock.change).toFixed(2)}</span>
-            </div>
-            <div className={cn("font-medium", stock.changePercent >= 0 ? "text-green-600" : "text-red-600")}>
-              {stock.changePercent >= 0 ? "+" : ""}
-              {stock.changePercent.toFixed(2)}%
-            </div>
-            <div>{formatVolume(stock.volume)}</div>
-            <div>{formatNumber(stock.marketCap)}</div>
-            <div>
-              <Badge variant="secondary" className="text-xs">
-                {stock.sector}
-              </Badge>
-            </div>
+            {expandedStockId === stock.id && (
+              <div className="border-t">
+                <StockExpandedView stock={stock} />
+              </div>
+            )}
           </div>
         ))}
       </div>

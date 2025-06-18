@@ -1,10 +1,9 @@
 "use client"
 
-import { useMutation } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { useDashboardStore } from "@/lib/stores/dashboardStore"
 import { useWebSocket } from "@/lib/hooks/useWebSocket"
-import { stocksService } from "@/services/stocks/stocks.service"
+import { useExportStocks } from "@/services/stocks/stocks.queries"
 import { FilterSidebar } from "./FilterSidebar"
 import { StockTable } from "./StockTable"
 import { DashboardHero } from "./DashboardHero"
@@ -24,30 +23,29 @@ export function Dashboard() {
   const wsUrl = process.env.NEXT_PUBLIC_WS_URL
   const { isConnected, connectionError, reconnect } = useWebSocket(wsUrl)
 
-  const exportMutation = useMutation({
-    mutationFn: () => stocksService.exportStocks(selectedFilters),
-    onSuccess: (data) => {
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([data]))
-      const link = document.createElement("a")
-      link.href = url
-      link.setAttribute("download", `stocks-export-${new Date().toISOString().split("T")[0]}.csv`)
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      window.URL.revokeObjectURL(url)
-      toast.success("Export completed successfully!")
-    },
-    onError: () => {
-      toast.error("Export failed. Please try again.")
-    },
-  })
+  const { mutate: exportStocks, isPending: isExporting } = useExportStocks()
 
   const handleExport = () => {
     if (!isPremium) {
       return
     }
-    exportMutation.mutate()
+    exportStocks(selectedFilters, {
+      onSuccess: (data) => {
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([data]))
+        const link = document.createElement("a")
+        link.href = url
+        link.setAttribute("download", `stocks-export-${new Date().toISOString().split("T")[0]}.csv`)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
+        toast.success("Export completed successfully!")
+      },
+      onError: () => {
+        toast.error("Export failed. Please try again.")
+      }
+    })
   }
 
   const getConnectionStatus = () => {
@@ -143,11 +141,11 @@ export function Dashboard() {
             {isPremium ? (
               <Button
                 onClick={handleExport}
-                disabled={exportMutation.isPending}
+                disabled={isExporting}
                 className="flex items-center space-x-2"
               >
                 <Download className="h-4 w-4" />
-                <span>{exportMutation.isPending ? "Exporting..." : "Export"}</span>
+                <span>{isExporting ? "Exporting..." : "Export"}</span>
               </Button>
             ) : (
               <UpgradePrompt
