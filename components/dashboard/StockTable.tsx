@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/lib/stores/authStore"
 import { UpgradePrompt } from "@/components/freemium/UpgradePrompt"
 import { FREEMIUM_LIMITS } from "@/services/stocks/stocks.service"
-import { StockExpandedView } from "./StockExpandedView"
+import { EnhancedStockExpandedView } from "./EnhancedStockExpandedView"
 
 const columns = [
   { key: "symbol", label: "Symbol", sortable: true },
@@ -145,7 +145,7 @@ export function StockTable() {
               onClick={() => handleRowClick(stock.id)}
               className={cn(
                 "grid grid-cols-8 gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer",
-                expandedStockId === stock.id && "bg-muted/50"
+                expandedStockId === stock.id && "bg-muted/50",
               )}
             >
               <div className="font-medium flex items-center gap-2">
@@ -178,7 +178,7 @@ export function StockTable() {
             </div>
             {expandedStockId === stock.id && (
               <div className="border-t">
-                <StockExpandedView stock={stock} />
+                <EnhancedStockExpandedView stock={stock} />
               </div>
             )}
           </div>
