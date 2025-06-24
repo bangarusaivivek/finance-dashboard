@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "description": "Professional stock market analytics platform with freemium features",
-  "author": "Your Name",
-  "license": "MIT",
   "keywords": [
     "finance",
     "stocks",
@@ -13,15 +11,17 @@
     "react",
     "freemium"
   ],
+  "license": "MIT",
+  "author": "Your Name",
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "start": "next start",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "latest",
